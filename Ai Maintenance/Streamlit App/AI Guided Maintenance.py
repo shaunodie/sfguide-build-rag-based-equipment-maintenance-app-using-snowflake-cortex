@@ -12,7 +12,7 @@ import streamlit as st
 from snowflake.snowpark.context import get_active_session
 
 # Write directly to the app
-st.title("AI-Guided Maintenance")
+st.title("Ai-Guided Maintenance")
 st.image('https://s3.amazonaws.com/assets.ottomotors.com/vehicles/product-card-OTTO_100.png', caption='')
 
 # Get the current credentials
