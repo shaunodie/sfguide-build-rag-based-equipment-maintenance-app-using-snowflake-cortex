@@ -1,14 +1,3 @@
-# sfguide-build-rag-based-equipment-maintenance-app-using-snowflake-cortex
-
-id: build_rag_based_equipment_maintenance_app_using_snowflake_cortex
-summary: Build Rag Based Equipment Maintenance App Using Snowflake Cortex
-categories: cortex,getting-started,app-development
-environments: web
-status: Published
-feedback link: <https://github.com/Snowflake-Labs/sfguides/issues>
-tags: Getting Started, Snowpark Python, Streamlit, LLMs, Data Engineering,CORTEX
-authors: Ryan Ellis, Tim Long
-
 # Build Rag Based Equipment Maintenance App Using Snowflake Cortex
 <!-- ------------------------ -->
 ## Overview
