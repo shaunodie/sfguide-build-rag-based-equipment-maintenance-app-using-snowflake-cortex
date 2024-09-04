@@ -18,6 +18,10 @@ CREATE STAGE REPAIR_MANUALS;
 
 --Upload repair manuals via GUI to the stage you just created
 
+--this is new!  we can copy from one stage to another
+--I uploaded using my right click tool to a public upload folder/stage
+COPY FILES INTO @repair_manuals from @UTIL_DB.public.uploads;
+
 LIST @repair_manuals;
 
 ----------------------------------------------------------------------
@@ -105,6 +109,13 @@ ORDER BY
 --Validate
 SELECT * FROM repair_manuals_chunked;
 
+
+USE ROLE ACCOUNTADMIN;
+
+CREATE ROLE cortex_user_role;
+GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE cortex_user_role;
+
+GRANT ROLE cortex_user_role TO USER sodonnell;
 ----------------------------------------------------------------------
 -- "Vectorize" the chunked text into a language encoded representation
 ----------------------------------------------------------------------  
@@ -114,7 +125,7 @@ SELECT
     chunk_number, 
     chunk_text, 
     combined_chunk_text,
-    snowflake.cortex.embed_text('e5-base-v2', combined_chunk_text) as combined_chunk_vector
+    snowflake.cortex.embed_text_768('e5-base-v2', combined_chunk_text) as combined_chunk_vector
 FROM 
     repair_manuals_chunked;
 
@@ -137,7 +148,7 @@ AS
             v.file_name,
             v.chunk_number,
             v.chunk_text,
-            VECTOR_COSINE_DISTANCE(v.combined_chunk_vector, snowflake.cortex.embed_text('e5-base-v2', prompt)) AS score
+            VECTOR_COSINE_SIMILARITY(v.combined_chunk_vector, snowflake.cortex.embed_text_768('e5-base-v2', prompt)) AS score
         FROM 
             repair_manuals_chunked_vectors v
         ORDER BY 
@@ -265,7 +276,7 @@ SELECT
     equipment_id,
     problem_reported,
     resolution_notes,
-    snowflake.cortex.embed_text('e5-base-v2', combined_text) as combined_vector
+    snowflake.cortex.embed_text_768('e5-base-v2', combined_text) as combined_vector
 FROM repair_logs_formatted;
 
 --Validate
@@ -282,9 +293,9 @@ AS
        WITH best_match_repair_logs AS (
             SELECT 
                 *, 
-                VECTOR_COSINE_DISTANCE(
+                VECTOR_COSINE_SIMILARITY(
                     combined_vector,
-                    snowflake.cortex.embed_text('e5-base-v2', prompt)
+                    snowflake.cortex.embed_text_768('e5-base-v2', prompt)
                 ) AS score
             FROM
                 repair_logs_vectors
